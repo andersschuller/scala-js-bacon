@@ -52,6 +52,48 @@ class BaconSuite extends AsyncFunSuite {
     toFuture(stream).map(values => assert(values == Nil))
   }
 
+  test("Create Property using constant") {
+    val value = "Some data"
+    val property = Bacon.constant(value)
+    toFuture(property).map(values => assert(values == List(value)))
+  }
+
+  test("Create Property from EventStream") {
+    val value = Option(3.14)
+    val stream = Bacon.once(value)
+    val property = stream.toProperty()
+    toFuture(property).map(values => assert(values == List(value)))
+  }
+
+  test("Create Property with initial value from EventStream") {
+    val value = 5
+    val stream = Bacon.once(value)
+    val initialValue = 4
+    val property = stream.toProperty(initialValue)
+    toFuture(property).map(values => assert(values == List(initialValue, value)))
+  }
+
+  test("Create EventStream from Property") {
+    val value = BigDecimal("1.23")
+    val property = Bacon.constant(value)
+    val stream = property.toEventStream()
+    toFuture(stream).map(values => assert(values == List(value)))
+  }
+
+  test("Combine Properties with and") {
+    val trueProperty = Bacon.constant(true)
+    val falseProperty = Bacon.constant(false)
+    val combinedProperty = trueProperty.and(falseProperty)
+    toFuture(combinedProperty).map(values => assert(values == List(false)))
+  }
+
+  test("Combine Properties with or") {
+    val trueProperty = Bacon.constant(true)
+    val falseProperty = Bacon.constant(false)
+    val combinedProperty = trueProperty.or(falseProperty)
+    toFuture(combinedProperty).map(values => assert(values == List(true)))
+  }
+
   private def toFuture[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values: List[T] = Nil
