@@ -9,6 +9,9 @@ object Bacon extends js.Object {
   def never(): EventStream[Nothing] = js.native
   def constant[T](value: T): Property[T] = js.native
 
+  def mergeAll[T](streams: EventStream[T]*): EventStream[T] = js.native
+  def mergeAll[T](streams: js.Array[EventStream[T]]): EventStream[T] = js.native
+
   @js.native
   sealed trait Event extends js.Object {
     def hasValue(): Boolean = js.native
@@ -45,6 +48,9 @@ object Bacon extends js.Object {
   @js.native
   trait EventStream[+T] extends Observable[T] {
     def toProperty[U >: T](initialValue: U = js.native): Property[U] = js.native
+
+    def concat[U >: T](otherStream: EventStream[U]): EventStream[U] = js.native
+    def merge[U >: T](otherStream: EventStream[U]): EventStream[U] = js.native
   }
 
   @js.native
