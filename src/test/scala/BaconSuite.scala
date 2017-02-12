@@ -94,6 +94,33 @@ class BaconSuite extends AsyncFunSuite {
     toFuture(combinedProperty).map(values => assert(values == List(true)))
   }
 
+  test("Push values into a Bus") {
+    val bus = new Bacon.Bus[String]
+    val eventualValues = toFuture(bus)
+    val input = List("First data", "Second data", "Third data")
+    input.foreach(bus.push)
+    bus.end()
+    eventualValues.map(values => assert(values == input))
+  }
+
+  test("Send Error into a Bus") {
+    val bus = new Bacon.Bus[Double]
+    val eventualFailure = toFuture(bus).failed
+    val error = "Divide by zero!"
+    bus.error(new Bacon.Error(error))
+    eventualFailure.map(exception => assert(exception.getMessage == error))
+  }
+
+  test("Plug EventStream into a Bus") {
+    val value = 1873
+    val stream = Bacon.once(value)
+    val bus = new Bacon.Bus[Int]
+    val eventualValues = toFuture(bus)
+    bus.plug(stream)
+    bus.end()
+    eventualValues.map(values => assert(values == List(value)))
+  }
+
   private def toFuture[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values: List[T] = Nil

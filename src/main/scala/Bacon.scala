@@ -54,4 +54,12 @@ object Bacon extends js.Object {
     def and[U >: T](other: Property[U]): Property[U] = js.native
     def or[U >: T](other: Property[U]): Property[U] = js.native
   }
+
+  @js.native
+  class Bus[T] extends EventStream[T] {
+    def push(value: T): Unit = js.native
+    def end(): Unit = js.native
+    def error(e: Error): Unit = js.native
+    def plug(stream: EventStream[T]): Unit = js.native
+  }
 }
