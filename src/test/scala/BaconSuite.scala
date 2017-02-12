@@ -1,68 +1,69 @@
-import org.scalatest.AsyncFunSuite
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{ FunSuite, Matchers }
 
 import scala.concurrent.{ Future, Promise }
 
-class BaconSuite extends AsyncFunSuite {
+class BaconSuite extends FunSuite with Matchers with ScalaFutures {
   test("Create Next event from a function") {
     val value = 2
     val event = new Bacon.Next[Int](() => value)
-    assert(event.value() == value)
-    assert(event.hasValue())
-    assert(event.isNext())
+    event.value() shouldEqual value
+    event.hasValue() shouldBe true
+    event.isNext() shouldBe true
   }
 
   test("Create Next event from a value") {
     val value = "foo"
     val event = new Bacon.Next(value)
-    assert(event.value() == value)
-    assert(event.hasValue())
-    assert(event.isNext())
+    event.value() shouldEqual value
+    event.hasValue() shouldBe true
+    event.isNext() shouldBe true
   }
 
   test("Create Initial event") {
     val value = false
     val event = new Bacon.Initial(value)
-    assert(event.value() == value)
-    assert(event.hasValue())
-    assert(event.isInitial())
+    event.value() shouldEqual value
+    event.hasValue() shouldBe true
+    event.isInitial() shouldBe true
   }
 
   test("Create End event") {
     val event = new Bacon.End
-    assert(!event.hasValue())
-    assert(event.isEnd())
+    event.hasValue() shouldBe false
+    event.isEnd() shouldBe true
   }
 
   test("Create Error event") {
     val error = "Something went wrong!"
     val event = new Bacon.Error(error)
-    assert(event.error == error)
-    assert(!event.hasValue())
-    assert(event.isError())
+    event.error shouldEqual error
+    event.hasValue() shouldBe false
+    event.isError() shouldBe true
   }
 
   test("Create EventStream using once") {
     val value = 76
     val stream = Bacon.once(value)
-    toFuture(stream).map(values => assert(values == List(value)))
+    collectValues(stream).futureValue shouldEqual List(value)
   }
 
   test("Create EventStream using never") {
     val stream = Bacon.never()
-    toFuture(stream).map(values => assert(values == Nil))
+    collectValues(stream).futureValue shouldEqual Nil
   }
 
   test("Create Property using constant") {
     val value = "Some data"
     val property = Bacon.constant(value)
-    toFuture(property).map(values => assert(values == List(value)))
+    collectValues(property).futureValue shouldEqual List(value)
   }
 
   test("Create Property from EventStream") {
     val value = Option(3.14)
     val stream = Bacon.once(value)
     val property = stream.toProperty()
-    toFuture(property).map(values => assert(values == List(value)))
+    collectValues(property).futureValue shouldEqual List(value)
   }
 
   test("Create Property with initial value from EventStream") {
@@ -70,58 +71,59 @@ class BaconSuite extends AsyncFunSuite {
     val stream = Bacon.once(value)
     val initialValue = 4
     val property = stream.toProperty(initialValue)
-    toFuture(property).map(values => assert(values == List(initialValue, value)))
+    collectValues(property).futureValue shouldEqual List(initialValue, value)
   }
 
   test("Create EventStream from Property") {
     val value = BigDecimal("1.23")
     val property = Bacon.constant(value)
     val stream = property.toEventStream()
-    toFuture(stream).map(values => assert(values == List(value)))
+    collectValues(stream).futureValue shouldEqual List(value)
   }
 
   test("Combine Properties with and") {
     val trueProperty = Bacon.constant(true)
     val falseProperty = Bacon.constant(false)
     val combinedProperty = trueProperty.and(falseProperty)
-    toFuture(combinedProperty).map(values => assert(values == List(false)))
+    collectValues(combinedProperty).futureValue shouldEqual List(false)
   }
 
   test("Combine Properties with or") {
     val trueProperty = Bacon.constant(true)
     val falseProperty = Bacon.constant(false)
     val combinedProperty = trueProperty.or(falseProperty)
-    toFuture(combinedProperty).map(values => assert(values == List(true)))
+    collectValues(combinedProperty).futureValue shouldEqual List(true)
   }
 
   test("Push values into a Bus") {
     val bus = new Bacon.Bus[String]
-    val eventualValues = toFuture(bus)
+    val eventualValues = collectValues(bus)
     val input = List("First data", "Second data", "Third data")
     input.foreach(bus.push)
     bus.end()
-    eventualValues.map(values => assert(values == input))
+    eventualValues.futureValue shouldEqual input
   }
 
   test("Send Error into a Bus") {
     val bus = new Bacon.Bus[Double]
-    val eventualFailure = toFuture(bus).failed
+    val eventualFailure = collectErrors(bus)
     val error = "Divide by zero!"
     bus.error(new Bacon.Error(error))
-    eventualFailure.map(exception => assert(exception.getMessage == error))
+    bus.end()
+    eventualFailure.futureValue shouldEqual List(error)
   }
 
   test("Plug EventStream into a Bus") {
     val value = 1873
     val stream = Bacon.once(value)
     val bus = new Bacon.Bus[Int]
-    val eventualValues = toFuture(bus)
+    val eventualValues = collectValues(bus)
     bus.plug(stream)
     bus.end()
-    eventualValues.map(values => assert(values == List(value)))
+    eventualValues.futureValue shouldEqual List(value)
   }
 
-  private def toFuture[T](observable: Bacon.Observable[T]): Future[List[T]] = {
+  private def collectValues[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values: List[T] = Nil
     observable.onValue { value =>
@@ -130,8 +132,17 @@ class BaconSuite extends AsyncFunSuite {
     observable.onEnd { _ =>
       promise.trySuccess(values.reverse)
     }
+    promise.future
+  }
+
+  private def collectErrors[T](observable: Bacon.Observable[T]): Future[List[String]] = {
+    val promise = Promise[List[String]]()
+    var errors: List[String] = Nil
     observable.onError { error =>
-      promise.tryFailure(new Exception(error.error))
+      errors = error.error :: errors
+    }
+    observable.onEnd { _ =>
+      promise.trySuccess(errors.reverse)
     }
     promise.future
   }
