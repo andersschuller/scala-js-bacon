@@ -2,7 +2,6 @@ import scala.scalajs.js
 
 @js.native
 object Bacon extends js.Object {
-  type Handler[-T1] = js.Function1[T1, js.Any]
   type Unsubscriber = js.Function0[js.Any]
 
   def once[T](value: T): EventStream[T] = js.native
@@ -40,9 +39,9 @@ object Bacon extends js.Object {
 
   @js.native
   sealed trait Observable[+T] extends js.Object {
-    def onValue(f: Handler[T]): Unsubscriber = js.native
-    def onEnd(f: Handler[End]): Unsubscriber = js.native
-    def onError(f: Handler[Error]): Unsubscriber = js.native
+    def onValue(f: js.Function1[T, Unit]): Unsubscriber = js.native
+    def onEnd(f: js.Function0[Unit]): Unsubscriber = js.native
+    def onError(f: js.Function1[String, Unit]): Unsubscriber = js.native
   }
 
   @js.native
@@ -65,7 +64,7 @@ object Bacon extends js.Object {
   class Bus[T] extends EventStream[T] {
     def push(value: T): Unit = js.native
     def end(): Unit = js.native
-    def error(e: Error): Unit = js.native
+    def error(e: String): Unit = js.native
     def plug(stream: EventStream[T]): Unit = js.native
   }
 }

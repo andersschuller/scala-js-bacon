@@ -141,7 +141,7 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     val bus = new Bacon.Bus[Double]
     val eventualFailure = collectErrors(bus)
     val error = "Divide by zero!"
-    bus.error(new Bacon.Error(error))
+    bus.error(error)
     bus.end()
     eventualFailure.futureValue shouldEqual List(error)
   }
@@ -162,7 +162,7 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     observable.onValue { value =>
       values = value :: values
     }
-    observable.onEnd { _ =>
+    observable.onEnd { () =>
       promise.trySuccess(values.reverse)
     }
     promise.future
@@ -172,9 +172,9 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     val promise = Promise[List[String]]()
     var errors: List[String] = Nil
     observable.onError { error =>
-      errors = error.error :: errors
+      errors = error :: errors
     }
-    observable.onEnd { _ =>
+    observable.onEnd { () =>
       promise.trySuccess(errors.reverse)
     }
     promise.future
