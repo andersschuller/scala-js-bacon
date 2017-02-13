@@ -1,3 +1,4 @@
+import scala.language.higherKinds
 import scala.scalajs.js
 import scala.scalajs.js.|
 
@@ -42,13 +43,22 @@ object Bacon extends js.Object {
 
   @js.native
   sealed trait Observable[+T] extends js.Object {
+    type Self[U] <: Observable[U]
+
     def onValue(f: js.Function1[T, Unit]): Unsubscriber = js.native
     def onEnd(f: js.Function0[Unit]): Unsubscriber = js.native
     def onError(f: js.Function1[String, Unit]): Unsubscriber = js.native
+
+    def take[U >: T](n: Int): Self[U] = js.native
+    def skip[U >: T](n: Int): Self[U] = js.native
+    def first[U >: T](): Self[U] = js.native
+    def last[U >: T](): Self[U] = js.native
   }
 
   @js.native
   trait EventStream[+T] extends Observable[T] {
+    type Self[U] = EventStream[U]
+
     def toProperty[U >: T](initialValue: U = js.native): Property[U] = js.native
 
     def concat[U >: T](otherStream: EventStream[U]): EventStream[U] = js.native
@@ -57,6 +67,8 @@ object Bacon extends js.Object {
 
   @js.native
   trait Property[+T] extends Observable[T] {
+    type Self[U] = Property[U]
+
     def toEventStream[U >: T](): EventStream[U] = js.native
 
     def and[U >: T](other: Property[U]): Property[U] = js.native

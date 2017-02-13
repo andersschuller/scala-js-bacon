@@ -172,6 +172,35 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     eventualValues.futureValue shouldEqual List(value)
   }
 
+  test("Take values from an Observable") {
+    val values = List[Int | Bacon.Error](1, 2, 3, 4, 5)
+    val stream = Bacon.fromArray(values.toJSArray)
+    val n = 3
+    val newStream = stream.take(n)
+    collectValues(newStream).futureValue shouldEqual values.take(n)
+  }
+
+  test("Skip values from an Observable") {
+    val value = "Some value"
+    val property = Bacon.constant(value)
+    val newProperty = property.take(10)
+    collectValues(newProperty).futureValue shouldEqual List(value)
+  }
+
+  test("Take first value from an Observable") {
+    val value = 9.072
+    val property = Bacon.constant(value)
+    val newProperty = property.first()
+    collectValues(newProperty).futureValue shouldEqual List(value)
+  }
+
+  test("Take last value from an Observable") {
+    val values = List[Char | Bacon.Error]('x', 'y', 'z')
+    val stream = Bacon.fromArray(values.toJSArray)
+    val newStream = stream.last()
+    collectValues(newStream).futureValue shouldEqual List(values.last)
+  }
+
   private def collectValues[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values: List[T] = Nil
