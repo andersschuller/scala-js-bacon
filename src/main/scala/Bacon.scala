@@ -1,10 +1,13 @@
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 @js.native
 object Bacon extends js.Object {
   type Unsubscriber = js.Function0[js.Any]
 
   def once[T](value: T): EventStream[T] = js.native
+  def once[T](error: Error): EventStream[T] = js.native
+  def fromArray[T](values: js.Array[T | Error]): EventStream[T] = js.native
   def never(): EventStream[Nothing] = js.native
   def constant[T](value: T): Property[T] = js.native
 

@@ -2,7 +2,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{ FunSuite, Matchers }
 
 import scala.concurrent.{ Future, Promise }
+import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.|
 
 class BaconSuite extends FunSuite with Matchers with ScalaFutures {
   test("Create Next event from a function") {
@@ -47,6 +49,20 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     val value = 76
     val stream = Bacon.once(value)
     collectValues(stream).futureValue shouldEqual List(value)
+  }
+
+  test("Create EventStream using once with an error") {
+    val error = "Something bad happened!"
+    val stream = Bacon.once[Double](new Bacon.Error(error))
+    collectErrors(stream).futureValue shouldEqual List(error)
+  }
+
+  test("Create EventStream using fromArray") {
+    val value = 1
+    val error = "fail"
+    val values = js.Array[Int | Bacon.Error](value, new Bacon.Error(error))
+    collectValues(Bacon.fromArray(values)).futureValue shouldEqual List(value)
+    collectErrors(Bacon.fromArray(values)).futureValue shouldEqual List(error)
   }
 
   test("Create EventStream using never") {
@@ -102,14 +118,14 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
 
   test("Combine EventStreams with mergeAll") {
     val values = (1 to 10).toList
-    val streams = values.map(Bacon.once)
+    val streams = values.map(Bacon.once[Int])
     val combinedStream = Bacon.mergeAll(streams: _*)
     collectValues(combinedStream).futureValue shouldEqual values
   }
 
   test("Combine array of EventStreams with mergeAll") {
     val values = (1 to 10).toList
-    val streams = values.map(Bacon.once)
+    val streams = values.map(Bacon.once[Int])
     val combinedStream = Bacon.mergeAll(streams.toJSArray)
     collectValues(combinedStream).futureValue shouldEqual values
   }
