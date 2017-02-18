@@ -65,6 +65,17 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     collectErrors(Bacon.fromArray(values)).futureValue shouldEqual List(error)
   }
 
+  test("Create EventStream using repeat") {
+    val stream = Bacon.repeat[Int](i => {
+      if (i < 3) {
+        Bacon.once(i)
+      } else {
+        false
+      }
+    })
+    collectValues(stream).futureValue shouldEqual List(0, 1, 2)
+  }
+
   test("Create EventStream using never") {
     val stream = Bacon.never()
     collectValues(stream).futureValue shouldEqual Nil

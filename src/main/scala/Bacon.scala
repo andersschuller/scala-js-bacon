@@ -9,6 +9,7 @@ object Bacon extends js.Object {
   def once[T](value: T): EventStream[T] = js.native
   def once[T](error: Error): EventStream[T] = js.native
   def fromArray[T](values: js.Array[T | Error]): EventStream[T] = js.native
+  def repeat[T](fn: js.Function1[Int, Observable[T] | Boolean]): EventStream[T] = js.native
   def never(): EventStream[Nothing] = js.native
   def constant[T](value: T): Property[T] = js.native
 
