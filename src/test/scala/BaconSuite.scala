@@ -212,6 +212,30 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     collectValues(newStream).futureValue shouldEqual List(values.last)
   }
 
+  test("Create Property from Observable using scan") {
+    val stream = Bacon.fromArray[Int](js.Array(1, 2, 3))
+    val property = stream.scan[Int](0, (x, y) => x + y)
+    collectValues(property).futureValue shouldEqual List(0, 1, 3, 6)
+  }
+
+  test("Create Property from Observable using fold") {
+    val stream = Bacon.fromArray[String](js.Array("H", "e", "ll", "o"))
+    val property = stream.fold[String]("", (x, y) => x + y)
+    collectValues(property).futureValue shouldEqual List("Hello")
+  }
+
+  test("Create Property from Observable using reduce") {
+    val stream = Bacon.fromArray[Boolean](js.Array(true, false))
+    val property = stream.reduce[Boolean](true, (x, y) => x && y)
+    collectValues(property).futureValue shouldEqual List(false)
+  }
+
+  test("Create Property from Observable using diff") {
+    val stream = Bacon.fromArray[Int](js.Array(1, 4, 9, 16))
+    val property = stream.diff[Int](0, (x, y) => y - x)
+    collectValues(property).futureValue shouldEqual List(1, 3, 5, 7)
+  }
+
   private def collectValues[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values: List[T] = Nil
