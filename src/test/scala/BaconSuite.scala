@@ -45,6 +45,13 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     event.isError() shouldBe true
   }
 
+  test("Create EventStream using fromCallback") {
+    val stream = Bacon.fromCallback[String] { callback =>
+      callback("Bacon!")
+    }
+    collectValues(stream).futureValue shouldEqual List("Bacon!")
+  }
+
   test("Create EventStream using once") {
     val value = 76
     val stream = Bacon.once(value)

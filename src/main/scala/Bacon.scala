@@ -4,9 +4,11 @@ import scala.scalajs.js.|
 
 @js.native
 object Bacon extends js.Object {
+  type Handler[-T] = js.Function1[T, Unit]
   type Unsubscriber = js.Function0[Unit]
-  type Sink[T] = js.Function1[T | Event[T] | js.Array[Event[T]], Unit]
+  type Sink[T] = Handler[T | Event[T] | js.Array[Event[T]]]
 
+  def fromCallback[T](f: Handler[Handler[T]]): EventStream[T] = js.native
   def once[T](value: T): EventStream[T] = js.native
   def once[T](error: Error): EventStream[T] = js.native
   def fromArray[T](values: js.Array[T | Error]): EventStream[T] = js.native
@@ -48,10 +50,10 @@ object Bacon extends js.Object {
   sealed trait Observable[+T] extends js.Object {
     type Self[U] <: Observable[U]
 
-    def subscribe(f: js.Function1[Event[T], Unit]): Unsubscriber = js.native
-    def onValue(f: js.Function1[T, Unit]): Unsubscriber = js.native
+    def subscribe(f: Handler[Event[T]]): Unsubscriber = js.native
+    def onValue(f: Handler[T]): Unsubscriber = js.native
     def onEnd(f: js.Function0[Unit]): Unsubscriber = js.native
-    def onError(f: js.Function1[String, Unit]): Unsubscriber = js.native
+    def onError(f: Handler[String]): Unsubscriber = js.native
 
     def map[U >: T, A](f: js.Function1[U, A]): Self[A] = js.native
     def mapError[U >: T](f: js.Function1[String, U]): Self[U] = js.native
