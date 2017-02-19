@@ -59,6 +59,9 @@ object Bacon extends js.Object {
     def fold[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def reduce[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def diff[A](start: A, f: js.Function2[A, T, A]): Property[A] = js.native
+
+    def log[U >: T](params: js.Any*): Self[U] = js.native
+    def doLog[U >: T](params: js.Any*): Self[U] = js.native
   }
 
   @js.native
