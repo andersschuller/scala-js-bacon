@@ -17,7 +17,7 @@ object Bacon extends js.Object {
   def mergeAll[T](streams: js.Array[EventStream[T]]): EventStream[T] = js.native
 
   @js.native
-  sealed trait Event extends js.Object {
+  sealed trait Event[+T] extends js.Object {
     def hasValue(): Boolean = js.native
     def isNext(): Boolean = js.native
     def isInitial(): Boolean = js.native
@@ -26,26 +26,27 @@ object Bacon extends js.Object {
   }
 
   @js.native
-  class Next[+T](f: js.Function0[T]) extends Event {
+  class Next[+T](f: js.Function0[T]) extends Event[T] {
     def this(value: T) = this(() => value)
     def value(): T = js.native
   }
 
   @js.native
-  class Initial[+T](initialValue: T) extends Event {
+  class Initial[+T](initialValue: T) extends Event[T] {
     def value(): T = js.native
   }
 
   @js.native
-  class End extends Event
+  class End extends Event[Nothing]
 
   @js.native
-  class Error(val error: String) extends Event
+  class Error(val error: String) extends Event[Nothing]
 
   @js.native
   sealed trait Observable[+T] extends js.Object {
     type Self[U] <: Observable[U]
 
+    def subscribe(f: js.Function1[Event[T], Unit]): Unsubscriber = js.native
     def onValue(f: js.Function1[T, Unit]): Unsubscriber = js.native
     def onEnd(f: js.Function0[Unit]): Unsubscriber = js.native
     def onError(f: js.Function1[String, Unit]): Unsubscriber = js.native
