@@ -60,7 +60,7 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
 
   test("Create EventStream using once with an error") {
     val error = "Something bad happened!"
-    val stream = Bacon.once[Double](new Bacon.Error(error))
+    val stream = Bacon.once(new Bacon.Error(error))
     collectErrors(stream).futureValue shouldEqual List(error)
   }
 
