@@ -81,6 +81,19 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     collectValues(stream).futureValue shouldEqual Nil
   }
 
+  test("Create EventStream using fromBinder") {
+    def newStream = Bacon.fromBinder[String] { sink =>
+      sink("first value")
+      sink(js.Array[Bacon.Event[String]](new Bacon.Next("2nd"), new Bacon.Next("3rd")))
+      sink(new Bacon.Error("oops, an error"))
+      sink(new Bacon.End())
+      () => ()
+    }
+
+    collectValues(newStream).futureValue shouldEqual List("first value", "2nd", "3rd")
+    collectErrors(newStream).futureValue shouldEqual List("oops, an error")
+  }
+
   test("Create Property using constant") {
     val value = "Some data"
     val property = Bacon.constant(value)

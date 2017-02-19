@@ -4,13 +4,15 @@ import scala.scalajs.js.|
 
 @js.native
 object Bacon extends js.Object {
-  type Unsubscriber = js.Function0[js.Any]
+  type Unsubscriber = js.Function0[Unit]
+  type Sink[T] = js.Function1[T | Event[T] | js.Array[Event[T]], Unit]
 
   def once[T](value: T): EventStream[T] = js.native
   def once[T](error: Error): EventStream[T] = js.native
   def fromArray[T](values: js.Array[T | Error]): EventStream[T] = js.native
   def repeat[T](fn: js.Function1[Int, Observable[T] | Boolean]): EventStream[T] = js.native
   def never(): EventStream[Nothing] = js.native
+  def fromBinder[T](f: js.Function1[Sink[T], Unsubscriber]): EventStream[T] = js.native
   def constant[T](value: T): Property[T] = js.native
 
   def mergeAll[T](streams: EventStream[T]*): EventStream[T] = js.native
