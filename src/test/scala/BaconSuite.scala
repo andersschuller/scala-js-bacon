@@ -183,6 +183,38 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     eventualValues.futureValue shouldEqual List(value)
   }
 
+  test("Map over values of an Observable") {
+    val stream = Bacon.fromArray[String](js.Array("3", "7", "19"))
+    val mappedStream = stream.map[String, Int](_.toInt)
+    collectValues(mappedStream).futureValue shouldEqual List(3, 7, 19)
+  }
+
+  test("Map over errors of an Observable") {
+    val stream = Bacon.fromArray[String](js.Array("a", new Bacon.Error("error b"), new Bacon.Error("error c")))
+    val mappedStream = stream.mapError(_.toUpperCase)
+    collectValues(mappedStream).futureValue shouldEqual List("a", "ERROR B", "ERROR C")
+  }
+
+  test("Map over end of an Observable") {
+    val property = Bacon.constant(2)
+    val mappedProperty = property.mapEnd(() => 73)
+    collectValues(mappedProperty).futureValue shouldEqual List(2, 73)
+  }
+
+  test("Filter values of an Observable") {
+    val stream = Bacon.fromArray[String](js.Array("true", "false", "TRUE", "True", "False"))
+    val filteredStream = stream.filter[String](_.toBoolean)
+    collectValues(filteredStream).futureValue shouldEqual List("true", "TRUE", "True")
+  }
+
+  test("Filter out errors or values of an Observable") {
+    def newStream = Bacon.fromArray[Int](js.Array(1, 2, new Bacon.Error("Error!"), 3, 4))
+    collectValues(newStream.skipErrors()).futureValue shouldEqual List(1, 2, 3, 4)
+    collectErrors(newStream.skipErrors()).futureValue shouldEqual List()
+    collectValues(newStream.errors()).futureValue shouldEqual List()
+    collectErrors(newStream.errors()).futureValue shouldEqual List("Error!")
+  }
+
   test("Take values from an Observable") {
     val values = List[Int | Bacon.Error](1, 2, 3, 4, 5)
     val stream = Bacon.fromArray(values.toJSArray)

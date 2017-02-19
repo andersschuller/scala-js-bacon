@@ -50,6 +50,13 @@ object Bacon extends js.Object {
     def onEnd(f: js.Function0[Unit]): Unsubscriber = js.native
     def onError(f: js.Function1[String, Unit]): Unsubscriber = js.native
 
+    def map[U >: T, A](f: js.Function1[U, A]): Self[A] = js.native
+    def mapError[U >: T](f: js.Function1[String, U]): Self[U] = js.native
+    def mapEnd[U >: T](f: js.Function0[U]): Self[U] = js.native
+    def filter[U >: T](f: js.Function1[U, Boolean]): Self[U] = js.native
+    def skipErrors[U >: T](): Self[U] = js.native
+    def errors(): Self[Nothing] = js.native
+
     def take[U >: T](n: Int): Self[U] = js.native
     def skip[U >: T](n: Int): Self[U] = js.native
     def first[U >: T](): Self[U] = js.native
