@@ -48,37 +48,37 @@ object Bacon extends js.Object {
 
   @js.native
   sealed trait Observable[+T] extends js.Object {
-    type Self[U] <: Observable[U]
+    type Self[+U] <: Observable[U]
 
     def subscribe(f: Handler[Event[T]]): Unsubscriber = js.native
     def onValue(f: Handler[T]): Unsubscriber = js.native
     def onEnd(f: js.Function0[Unit]): Unsubscriber = js.native
     def onError(f: Handler[String]): Unsubscriber = js.native
 
-    def map[U >: T, A](f: js.Function1[U, A]): Self[A] = js.native
+    def map[A](f: js.Function1[T, A]): Self[A] = js.native
     def mapError[U >: T](f: js.Function1[String, U]): Self[U] = js.native
     def mapEnd[U >: T](f: js.Function0[U]): Self[U] = js.native
-    def filter[U >: T](f: js.Function1[U, Boolean]): Self[U] = js.native
-    def skipErrors[U >: T](): Self[U] = js.native
+    def filter(f: js.Function1[T, Boolean]): Self[T] = js.native
+    def skipErrors(): Self[T] = js.native
     def errors(): Self[Nothing] = js.native
 
-    def take[U >: T](n: Int): Self[U] = js.native
-    def skip[U >: T](n: Int): Self[U] = js.native
-    def first[U >: T](): Self[U] = js.native
-    def last[U >: T](): Self[U] = js.native
+    def take(n: Int): Self[T] = js.native
+    def skip(n: Int): Self[T] = js.native
+    def first(): Self[T] = js.native
+    def last(): Self[T] = js.native
 
     def scan[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def fold[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def reduce[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def diff[A](start: A, f: js.Function2[A, T, A]): Property[A] = js.native
 
-    def log[U >: T](params: js.Any*): Self[U] = js.native
-    def doLog[U >: T](params: js.Any*): Self[U] = js.native
+    def log(params: js.Any*): Self[T] = js.native
+    def doLog(params: js.Any*): Self[T] = js.native
   }
 
   @js.native
   sealed trait EventStream[+T] extends Observable[T] {
-    type Self[U] = EventStream[U]
+    type Self[+U] = EventStream[U]
 
     def toProperty[U >: T](initialValue: U = js.native): Property[U] = js.native
 
@@ -88,9 +88,9 @@ object Bacon extends js.Object {
 
   @js.native
   sealed trait Property[+T] extends Observable[T] {
-    type Self[U] = Property[U]
+    type Self[+U] = Property[U]
 
-    def toEventStream[U >: T](): EventStream[U] = js.native
+    def toEventStream(): EventStream[T] = js.native
 
     def and[U >: T](other: Property[U]): Property[U] = js.native
     def or[U >: T](other: Property[U]): Property[U] = js.native

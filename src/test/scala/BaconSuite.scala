@@ -205,7 +205,7 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
 
   test("Map over values of an Observable") {
     val stream = Bacon.fromArray[String](js.Array("3", "7", "19"))
-    val mappedStream = stream.map[String, Int](_.toInt)
+    val mappedStream = stream.map(_.toInt)
     collectValues(mappedStream).futureValue shouldEqual List(3, 7, 19)
   }
 
@@ -223,7 +223,7 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
 
   test("Filter values of an Observable") {
     val stream = Bacon.fromArray[String](js.Array("true", "false", "TRUE", "True", "False"))
-    val filteredStream = stream.filter[String](_.toBoolean)
+    val filteredStream = stream.filter(_.toBoolean)
     collectValues(filteredStream).futureValue shouldEqual List("true", "TRUE", "True")
   }
 
