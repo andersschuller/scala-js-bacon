@@ -77,7 +77,7 @@ object Bacon extends js.Object {
   }
 
   @js.native
-  trait EventStream[+T] extends Observable[T] {
+  sealed trait EventStream[+T] extends Observable[T] {
     type Self[U] = EventStream[U]
 
     def toProperty[U >: T](initialValue: U = js.native): Property[U] = js.native
@@ -87,7 +87,7 @@ object Bacon extends js.Object {
   }
 
   @js.native
-  trait Property[+T] extends Observable[T] {
+  sealed trait Property[+T] extends Observable[T] {
     type Self[U] = Property[U]
 
     def toEventStream[U >: T](): EventStream[U] = js.native
