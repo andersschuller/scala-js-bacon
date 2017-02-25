@@ -66,6 +66,7 @@ object Bacon extends js.Object {
     def skip(n: Int): Self[T] = js.native
     def first(): Self[T] = js.native
     def last(): Self[T] = js.native
+    def not[U >: T]()(implicit evidence: U =:= Boolean): Self[U] = js.native
 
     def scan[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def fold[A](seed: A, f: js.Function2[A, T, A]): Property[A] = js.native

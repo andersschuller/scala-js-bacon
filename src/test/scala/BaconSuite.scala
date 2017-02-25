@@ -264,6 +264,12 @@ class BaconSuite extends FunSuite with Matchers with ScalaFutures {
     collectValues(newStream).futureValue shouldEqual List(values.last)
   }
 
+  test("Create negated Observable using not") {
+    val stream = Bacon.fromArray[Boolean](js.Array(false, false, false, true))
+    val negatedStream = stream.not()
+    collectValues(negatedStream).futureValue shouldEqual List(true, true, true, false)
+  }
+
   test("Create Property from Observable using scan") {
     val stream = Bacon.fromArray[Int](js.Array(1, 2, 3))
     val property = stream.scan[Int](0, (x, y) => x + y)
