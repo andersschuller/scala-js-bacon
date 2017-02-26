@@ -292,6 +292,14 @@ class BaconSuite extends FunSuite with Matchers with BaconMatchers with ScalaFut
     property should containValues(List(1, 3, 5, 7))
   }
 
+  test("Create Property from Observable using decode") {
+    val property = Bacon.constant('B')
+    val stream = Bacon.fromArray[Int](js.Array(1, 2, 1))
+    val mapping = js.Dictionary[Char | Bacon.Property[Char]]("1" -> 'A', "2" -> property)
+    val decoded = stream.decode(mapping)
+    decoded should containValues(List('A'))
+  }
+
   test("Subscribe to Observable") {
     val stream = Bacon.once("Text")
     var result: Option[String] = None
