@@ -62,6 +62,9 @@ object Bacon extends js.Object {
     def skipErrors(): Self[T] = js.native
     def errors(): Self[Nothing] = js.native
 
+    def flatMap[A](f: js.Function1[T, Observable[A]]): EventStream[A] = js.native
+    def flatMapError[U >: T](f: js.Function1[String, Observable[U]]): EventStream[U] = js.native
+
     def take(n: Int): Self[T] = js.native
     def skip(n: Int): Self[T] = js.native
     def first(): Self[T] = js.native

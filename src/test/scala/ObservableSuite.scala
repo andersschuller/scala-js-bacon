@@ -35,6 +35,22 @@ class ObservableSuite extends BaseSuite {
     newStream.errors() should containErrors(List("Error!"))
   }
 
+  test("Flat map over values of an Observable") {
+    val stream = Bacon.fromArray[Int](js.Array(1, 2, 1))
+    def repeat[T](value: T)(times: Int): Bacon.EventStream[T] = {
+      val values = List.fill[T | Bacon.Error](times)(value)
+      Bacon.fromArray(values.toJSArray)
+    }
+    val flatMappedStream = stream.flatMap(repeat("A"))
+    flatMappedStream should containValues(List("A", "A", "A", "A"))
+  }
+
+  test("Flat map over errors of an Observable") {
+    val stream = Bacon.fromArray[String](js.Array("a", new Bacon.Error("error b"), new Bacon.Error("error c")))
+    val flatMappedStream = stream.flatMapError(error => Bacon.once(error))
+    flatMappedStream should containValues(List("a", "error b", "error c"))
+  }
+
   test("Take values from an Observable") {
     val values = List[Int | Bacon.Error](1, 2, 3, 4, 5)
     val stream = Bacon.fromArray(values.toJSArray)
