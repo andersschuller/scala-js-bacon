@@ -1,11 +1,10 @@
+import org.scalatest.{ FunSuite, Matchers }
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.{ MatchResult, Matcher }
 
 import scala.concurrent.{ Future, Promise }
 
-trait BaconMatchers {
-  self: ScalaFutures =>
-
+abstract class BaseSuite extends FunSuite with Matchers with ScalaFutures {
   def collectValues[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values = List.empty[T]

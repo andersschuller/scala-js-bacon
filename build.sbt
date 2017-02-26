@@ -13,3 +13,5 @@ jsDependencies ++= Seq(
   "org.webjars.npm" % "baconjs" % "0.7.88" / "Bacon.js" minified "Bacon.min.js",
   RuntimeDOM % "test"
 )
+
+logBuffered in Test := false
