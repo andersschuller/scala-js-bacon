@@ -1,4 +1,6 @@
 class SubscriberSuite extends BaseSuite {
+  override def newInstance = new SubscriberSuite
+
   test("Subscribe to Observable") {
     val stream = Bacon.once("Text")
     var result: Option[String] = None

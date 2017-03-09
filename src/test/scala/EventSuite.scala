@@ -1,4 +1,6 @@
 class EventSuite extends BaseSuite {
+  override def newInstance = new EventSuite
+
   test("Create Next event from a function") {
     val value = 2
     val event = new Bacon.Next[Int](() => value)

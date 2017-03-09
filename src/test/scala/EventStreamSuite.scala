@@ -1,9 +1,11 @@
 class EventStreamSuite extends BaseSuite {
+  override def newInstance = new EventStreamSuite
+
   test("Create Property from EventStream") {
     val value = Option(3.14)
     val stream = Bacon.once(value)
     val property = stream.toProperty()
-    property should containValues(List(value))
+    assertContainsValues(property, List(value))
   }
 
   test("Create Property with initial value from EventStream") {
@@ -11,7 +13,7 @@ class EventStreamSuite extends BaseSuite {
     val stream = Bacon.once(value)
     val initialValue = 4
     val property = stream.toProperty(initialValue)
-    property should containValues(List(initialValue, value))
+    assertContainsValues(property, List(initialValue, value))
   }
 
   test("Combine EventStreams with concat") {
@@ -20,7 +22,7 @@ class EventStreamSuite extends BaseSuite {
     val firstStream = Bacon.once(firstValue)
     val secondStream = Bacon.once(secondValue)
     val combinedStream = firstStream.concat(secondStream)
-    combinedStream should containValues(List(firstValue, secondValue))
+    assertContainsValues(combinedStream, List(firstValue, secondValue))
   }
 
   test("Combine EventStreams with merge") {
@@ -29,6 +31,6 @@ class EventStreamSuite extends BaseSuite {
     val firstStream = Bacon.once(firstValue)
     val secondStream = Bacon.once(secondValue)
     val combinedStream = firstStream.merge(secondStream)
-    combinedStream should containValues(List(firstValue, secondValue))
+    assertContainsValues(combinedStream, List(firstValue, secondValue))
   }
 }

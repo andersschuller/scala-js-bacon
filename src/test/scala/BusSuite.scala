@@ -1,20 +1,22 @@
 class BusSuite extends BaseSuite {
+  override def newInstance = new BusSuite
+
   test("Push values into a Bus") {
     val bus = new Bacon.Bus[String]
     val eventualValues = collectValues(bus)
     val input = List("First data", "Second data", "Third data")
     input.foreach(bus.push)
     bus.end()
-    eventualValues.futureValue shouldEqual input
+    eventualValues.map(_ shouldEqual input)
   }
 
   test("Send Error into a Bus") {
     val bus = new Bacon.Bus[Double]
-    val eventualFailure = collectErrors(bus)
+    val eventualErrors = collectErrors(bus)
     val error = "Divide by zero!"
     bus.error(error)
     bus.end()
-    eventualFailure.futureValue shouldEqual List(error)
+    eventualErrors.map(_ shouldEqual List(error))
   }
 
   test("Plug EventStream into a Bus") {
@@ -24,6 +26,6 @@ class BusSuite extends BaseSuite {
     val eventualValues = collectValues(bus)
     bus.plug(stream)
     bus.end()
-    eventualValues.futureValue shouldEqual List(value)
+    eventualValues.map(_ shouldEqual List(value))
   }
 }

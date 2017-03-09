@@ -1,10 +1,14 @@
-import org.scalatest.{ FunSuite, Matchers }
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.{ MatchResult, Matcher }
+import org.scalatest.{ Assertion, AsyncFunSuite, Matchers, ParallelTestExecution }
 
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.duration._
+import scala.concurrent.{ ExecutionContext, Future, Promise }
+import scala.scalajs.js.timers.setTimeout
 
-abstract class BaseSuite extends FunSuite with Matchers with ScalaFutures {
+abstract class BaseSuite extends AsyncFunSuite with Matchers with ParallelTestExecution {
+  import BaseSuite._
+
+  override implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
+
   def collectValues[T](observable: Bacon.Observable[T]): Future[List[T]] = {
     val promise = Promise[List[T]]()
     var values = List.empty[T]
@@ -14,7 +18,7 @@ abstract class BaseSuite extends FunSuite with Matchers with ScalaFutures {
     observable.onEnd { () =>
       promise.trySuccess(values.reverse)
     }
-    promise.future
+    withTimeout(promise.future)
   }
 
   def collectErrors(observable: Bacon.Observable[Any]): Future[List[String]] = {
@@ -26,36 +30,27 @@ abstract class BaseSuite extends FunSuite with Matchers with ScalaFutures {
     observable.onEnd { () =>
       promise.trySuccess(errors.reverse)
     }
+    withTimeout(promise.future)
+  }
+
+  def assertContainsValues[T](observable: Bacon.Observable[T], expectedValues: List[T]): Future[Assertion] = {
+    collectValues(observable).map(_ shouldEqual expectedValues)
+  }
+
+  def assertContainsErrors(observable: Bacon.Observable[Any], expectedErrors: List[String]): Future[Assertion] = {
+    collectErrors(observable).map(_ shouldEqual expectedErrors)
+  }
+
+  def withTimeout[T](future: Future[T]): Future[T] = {
+    val promise = Promise[T]
+    promise.tryCompleteWith(future)
+    setTimeout(futureTimeout) {
+      promise.tryFailure(new Exception(s"Future did not complete within $futureTimeout"))
+    }
     promise.future
   }
+}
 
-  def containValues[T](expectedValues: List[T]): Matcher[Bacon.Observable[T]] = {
-    new ObservableValuesMatcher(expectedValues)
-  }
-
-  def containErrors(expectedErrors: List[String]): Matcher[Bacon.Observable[Any]] = {
-    new ObservableErrorsMatcher(expectedErrors)
-  }
-
-  private class ObservableValuesMatcher[T](expectedValues: List[T]) extends Matcher[Bacon.Observable[T]] {
-    override def apply(observable: Bacon.Observable[T]): MatchResult = {
-      val values = collectValues(observable).futureValue
-      MatchResult(
-        values == expectedValues,
-        s"The observable $observable contained values $values instead of the expected values $expectedValues",
-        s"The observable $observable contained values $expectedValues"
-      )
-    }
-  }
-
-  private class ObservableErrorsMatcher(expectedErrors: List[String]) extends Matcher[Bacon.Observable[Any]] {
-    override def apply(observable: Bacon.Observable[Any]): MatchResult = {
-      val errors = collectErrors(observable).futureValue
-      MatchResult(
-        errors == expectedErrors,
-        s"The observable $observable contained errors $errors instead of the expected errors $expectedErrors",
-        s"The observable $observable contained errors $expectedErrors"
-      )
-    }
-  }
+object BaseSuite {
+  private val futureTimeout = 2.seconds
 }
