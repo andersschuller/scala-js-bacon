@@ -5,6 +5,13 @@ import scala.scalajs.js.|
 class BaconSuite extends BaseSuite {
   override def newInstance = new BaconSuite
 
+  test("Create EventStream using fromPromise") {
+    val value = 97
+    val promise = js.Promise.resolve[Int](value)
+    val stream = Bacon.fromPromise(promise)
+    assertContainsValues(stream, List(value))
+  }
+
   test("Create EventStream using fromCallback") {
     val stream = Bacon.fromCallback[String] { callback =>
       callback("Bacon!")

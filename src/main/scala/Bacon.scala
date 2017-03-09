@@ -8,6 +8,7 @@ object Bacon extends js.Object {
   type Unsubscriber = js.Function0[Unit]
   type Sink[T] = Handler[T | Event[T] | js.Array[Event[T]]]
 
+  def fromPromise[T](promise: js.Promise[T]): EventStream[T] = js.native
   def fromCallback[T](f: Handler[Handler[T]]): EventStream[T] = js.native
   def once[T](value: T): EventStream[T] = js.native
   def once(error: Error): EventStream[Nothing] = js.native
