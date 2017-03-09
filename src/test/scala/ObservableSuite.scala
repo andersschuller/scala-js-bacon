@@ -118,4 +118,18 @@ class ObservableSuite extends BaseSuite {
     val decoded = stream.decode(mapping)
     assertContainsValues(decoded, List('A'))
   }
+
+  test("Create Promise from last value of Observable") {
+    val values = List[Int | Bacon.Error](1, 2, 3)
+    val stream = Bacon.fromArray(values.toJSArray)
+    val promise = stream.toPromise()
+    withTimeout(promise.toFuture).map(_ shouldEqual values.last)
+  }
+
+  test("Create Promise from first value of Observable") {
+    val value = 'q'
+    val property = Bacon.constant(value)
+    val promise = property.firstToPromise()
+    withTimeout(promise.toFuture).map(_ shouldEqual value)
+  }
 }

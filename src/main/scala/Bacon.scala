@@ -77,6 +77,9 @@ object Bacon extends js.Object {
     def diff[A](start: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def decode[A](mapping: js.Dictionary[A | Property[A]]): Property[A] = js.native
 
+    def toPromise(): js.Promise[T] = js.native
+    def firstToPromise(): js.Promise[T] = js.native
+
     def log(params: js.Any*): Self[T] = js.native
     def doLog(params: js.Any*): Self[T] = js.native
   }
