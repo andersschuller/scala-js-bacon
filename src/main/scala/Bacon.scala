@@ -1,3 +1,5 @@
+import org.scalajs.dom
+
 import scala.language.higherKinds
 import scala.scalajs.js
 import scala.scalajs.js.|
@@ -9,6 +11,7 @@ object Bacon extends js.Object {
   type Sink[T] = Handler[T | Event[T] | js.Array[Event[T]]]
 
   def fromPromise[T](promise: js.Promise[T]): EventStream[T] = js.native
+  def fromEvent[T <: dom.Event](target: dom.EventTarget, eventName: String): EventStream[T] = js.native
   def fromCallback[T](f: Handler[Handler[T]]): EventStream[T] = js.native
   def once[T](value: T): EventStream[T] = js.native
   def once(error: Error): EventStream[Nothing] = js.native

@@ -1,3 +1,5 @@
+import org.scalajs.dom
+
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.|
@@ -10,6 +12,19 @@ class BaconSuite extends BaseSuite {
     val promise = js.Promise.resolve[Int](value)
     val stream = Bacon.fromPromise(promise)
     assertContainsValues(stream, List(value))
+  }
+
+  test("Create EventStream using fromEvent") {
+    val eventType = "custom"
+    val element = dom.document.createElement("div")
+    val stream = Bacon.fromEvent(element, eventType).take(1)
+    val eventualValues = collectValues(stream)
+
+    val event = dom.document.createEvent("Event")
+    event.initEvent(eventType, canBubbleArg = true, cancelableArg = true)
+    element.dispatchEvent(event)
+
+    eventualValues.map(_ shouldEqual List(event))
   }
 
   test("Create EventStream using fromCallback") {
