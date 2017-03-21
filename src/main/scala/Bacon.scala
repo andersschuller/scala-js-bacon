@@ -2,8 +2,10 @@ import org.scalajs.dom
 
 import scala.language.higherKinds
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
+@JSGlobal
 @js.native
 object Bacon extends js.Object {
   type Handler[-T] = js.Function1[T, Unit]
