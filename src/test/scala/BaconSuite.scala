@@ -89,6 +89,18 @@ class BaconSuite extends BaseSuite {
     assertContainsValues(property, List(value))
   }
 
+  test("Combine Observables and values with combineAsArray") {
+    val streams = List[Int | Bacon.Observable[Int]](7, Bacon.once(8), Bacon.constant(9))
+    val property = Bacon.combineAsArray(streams: _*).map(_.toList)
+    assertContainsValues(property, List(List(7, 8, 9)))
+  }
+
+  test("Combine array of Observables and values with combineAsArray") {
+    val streams = js.Array[Int | Bacon.Observable[Int]](7, Bacon.once(8), Bacon.constant(9))
+    val property = Bacon.combineAsArray(streams).map(_.toList)
+    assertContainsValues(property, List(List(7, 8, 9)))
+  }
+
   test("Combine EventStreams with mergeAll") {
     val values = (1 to 10).toList
     val streams = values.map(Bacon.once[Int])

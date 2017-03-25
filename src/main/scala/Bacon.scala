@@ -23,6 +23,8 @@ object Bacon extends js.Object {
   def fromBinder[T](f: js.Function1[Sink[T], Unsubscriber]): EventStream[T] = js.native
   def constant[T](value: T): Property[T] = js.native
 
+  def combineAsArray[T](streams: (T | Observable[T])*): Property[js.Array[T]] = js.native
+  def combineAsArray[T](streams: js.Array[T | Observable[T]]): Property[js.Array[T]] = js.native
   def mergeAll[T](streams: EventStream[T]*): EventStream[T] = js.native
   def mergeAll[T](streams: js.Array[EventStream[T]]): EventStream[T] = js.native
 
