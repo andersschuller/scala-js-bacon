@@ -90,6 +90,8 @@ object Bacon extends js.Object {
 
     def log(params: js.Any*): Self[T] = js.native
     def doLog(params: js.Any*): Self[T] = js.native
+
+    def withHandler[A](handler: js.ThisFunction1[Dispatcher[A], Event[T], js.Any]): Self[A] = js.native
   }
 
   @js.native
@@ -118,5 +120,10 @@ object Bacon extends js.Object {
     def end(): Unit = js.native
     def error(e: String): Unit = js.native
     def plug(stream: EventStream[T]): Unit = js.native
+  }
+
+  @js.native
+  sealed trait Dispatcher[-T] extends js.Object {
+    def push(event: Event[T]): js.Any = js.native
   }
 }

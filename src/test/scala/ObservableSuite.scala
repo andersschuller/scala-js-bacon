@@ -132,4 +132,19 @@ class ObservableSuite extends BaseSuite {
     val promise = property.firstToPromise()
     withTimeout(promise.toFuture).map(_ shouldEqual value)
   }
+
+  test("Implement custom event handling using withHandler") {
+    val stream = Bacon.fromArray[Int](js.Array(76, 19, -5, 8))
+
+    val customStream = stream.withHandler[String] { (dispatcher, event) =>
+      event match {
+        case n: Bacon.Next[Int] if n.value() > 0 =>
+          dispatcher.push(new Bacon.Next(n.value().toString))
+        case _ =>
+          dispatcher.push(new Bacon.End)
+      }
+    }
+
+    assertContainsValues(customStream, List("76", "19"))
+  }
 }
