@@ -4,6 +4,14 @@ scalaVersion := "2.12.1"
 
 enablePlugins(ScalaJSPlugin)
 
+scalacOptions := Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked",
+  "-Xfatal-warnings",
+  "-Xfuture"
+)
+
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
   "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
