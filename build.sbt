@@ -1,6 +1,6 @@
 name := "Scala.js Bacon"
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.2"
 
 enablePlugins(ScalaJSPlugin)
 
