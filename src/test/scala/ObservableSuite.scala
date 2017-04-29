@@ -31,10 +31,12 @@ class ObservableSuite extends BaseSuite {
 
   test("Filter out errors or values of an Observable") {
     def newStream = Bacon.fromArray[Int](js.Array(1, 2, new Bacon.Error("Error!"), 3, 4))
-    assertContainsValues(newStream.skipErrors(), List(1, 2, 3, 4))
-    assertContainsErrors(newStream.skipErrors(), List())
-    assertContainsValues(newStream.errors(), List())
-    assertContainsErrors(newStream.errors(), List("Error!"))
+    assertAll(
+      assertContainsValues(newStream.skipErrors(), List(1, 2, 3, 4)),
+      assertContainsErrors(newStream.skipErrors(), List()),
+      assertContainsValues(newStream.errors(), List()),
+      assertContainsErrors(newStream.errors(), List("Error!"))
+    )
   }
 
   test("Flat map over values of an Observable") {

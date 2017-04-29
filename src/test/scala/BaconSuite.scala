@@ -50,8 +50,10 @@ class BaconSuite extends BaseSuite {
     val value = 1
     val error = "fail"
     val values = js.Array[Int | Bacon.Error](value, new Bacon.Error(error))
-    assertContainsValues(Bacon.fromArray(values), List(value))
-    assertContainsErrors(Bacon.fromArray(values), List(error))
+    assertAll(
+      assertContainsValues(Bacon.fromArray(values), List(value)),
+      assertContainsErrors(Bacon.fromArray(values), List(error))
+    )
   }
 
   test("Create EventStream using repeat") {
@@ -79,8 +81,10 @@ class BaconSuite extends BaseSuite {
       () => ()
     }
 
-    assertContainsValues(newStream, List("first value", "2nd", "3rd"))
-    assertContainsErrors(newStream, List("oops, an error"))
+    assertAll(
+      assertContainsValues(newStream, List("first value", "2nd", "3rd")),
+      assertContainsErrors(newStream, List("oops, an error"))
+    )
   }
 
   test("Create Property using constant") {

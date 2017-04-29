@@ -1,4 +1,4 @@
-import org.scalatest.{ Assertion, AsyncFunSuite, Matchers, ParallelTestExecution }
+import org.scalatest._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future, Promise }
@@ -48,6 +48,11 @@ abstract class BaseSuite extends AsyncFunSuite with Matchers with ParallelTestEx
       promise.tryFailure(new Exception(s"Future did not complete within $futureTimeout"))
     }
     promise.future
+  }
+
+  def assertAll(eventualAssertions: Future[Assertion]*): Future[Assertion] = {
+    Future.sequence(eventualAssertions)
+      .map(_.find(_ != Succeeded).getOrElse(Succeeded))
   }
 }
 
