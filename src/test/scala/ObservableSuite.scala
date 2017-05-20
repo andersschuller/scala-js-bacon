@@ -121,6 +121,20 @@ class ObservableSuite extends BaseSuite {
     assertContainsValues(decoded, List('A'))
   }
 
+  test("Combine Observables using zip") {
+    val firstStream = Bacon.fromArray[Int](js.Array(1, 2))
+    val secondStream = Bacon.fromArray[Int](js.Array(3, 4))
+    val zippedStream = firstStream.zip(secondStream).map(_.toList)
+    assertContainsValues(zippedStream, List(List(1, 3), List(2, 4)))
+  }
+
+  test("Combine Observables using zip with a function") {
+    val firstStream = Bacon.fromArray[Int](js.Array(1, 2, 3, 4))
+    val secondStream = Bacon.fromArray[Char](js.Array('a', 'b', 'c', 'd'))
+    val zippedStream = firstStream.zip[Char, String](secondStream, (x, y) => x.toString + y.toString)
+    assertContainsValues(zippedStream, List("1a", "2b", "3c", "4d"))
+  }
+
   test("Create Promise from last value of Observable") {
     val values = List[Int | Bacon.Error](1, 2, 3)
     val stream = Bacon.fromArray(values.toJSArray)

@@ -85,6 +85,9 @@ object Bacon extends js.Object {
     def diff[A](start: A, f: js.Function2[A, T, A]): Property[A] = js.native
     def decode[A](mapping: js.Dictionary[A | Property[A]]): Property[A] = js.native
 
+    def zip[U >: T](other: Observable[U]): EventStream[js.Array[U]] = js.native
+    def zip[A, U](other: Observable[A], f: js.Function2[T, A, U]): EventStream[U] = js.native
+
     def toPromise(): js.Promise[T] = js.native
     def firstToPromise(): js.Promise[T] = js.native
 
