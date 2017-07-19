@@ -10,7 +10,13 @@ import scala.scalajs.js.|
 object Bacon extends js.Object {
   type Handler[-T] = js.Function1[T, Unit]
   type Unsubscriber = js.Function0[Unit]
-  type Sink[T] = Handler[T | Event[T] | js.Array[Event[T]]]
+  type Sink[T] = js.Function1[T | Event[T] | js.Array[Event[T]], PushResult]
+
+  @js.native
+  sealed trait PushResult extends js.Any
+
+  val more: PushResult = js.native
+  val noMore: PushResult = js.native
 
   def fromPromise[T](promise: js.Promise[T]): EventStream[T] = js.native
   def fromEvent[T <: dom.Event](target: dom.EventTarget, eventName: String): EventStream[T] = js.native
@@ -94,7 +100,7 @@ object Bacon extends js.Object {
     def log(params: js.Any*): Self[T] = js.native
     def doLog(params: js.Any*): Self[T] = js.native
 
-    def withHandler[A](handler: js.ThisFunction1[Dispatcher[A], Event[T], js.Any]): Self[A] = js.native
+    def withHandler[A](handler: js.ThisFunction1[Dispatcher[A], Event[T], PushResult]): Self[A] = js.native
   }
 
   @js.native
@@ -127,6 +133,6 @@ object Bacon extends js.Object {
 
   @js.native
   sealed trait Dispatcher[-T] extends js.Object {
-    def push(event: Event[T]): js.Any = js.native
+    def push(event: Event[T]): PushResult = js.native
   }
 }

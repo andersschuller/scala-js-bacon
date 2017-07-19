@@ -38,7 +38,7 @@ object BaconExtensions {
           case e: Bacon.Error =>
             dispatcher.push(e)
           case _ =>
-            ()
+            Bacon.more
         }
       }
     }
