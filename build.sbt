@@ -14,7 +14,7 @@ scalacOptions := Seq(
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-  "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+  "com.lihaoyi" %%% "utest" % "0.4.8" % "test"
 )
 
 jsDependencies ++= Seq(
@@ -22,4 +22,4 @@ jsDependencies ++= Seq(
   RuntimeDOM % "test"
 )
 
-logBuffered in Test := false
+testFrameworks += new TestFramework("utest.runner.Framework")

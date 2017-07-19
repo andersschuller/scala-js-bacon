@@ -1,41 +1,43 @@
-class EventSuite extends BaseSuite {
-  override def newInstance = new EventSuite
+import utest._
 
-  test("Create Next event from a function") {
-    val value = 2
-    val event = new Bacon.Next[Int](() => value)
-    event.value() shouldEqual value
-    event.hasValue() shouldBe true
-    event.isNext() shouldBe true
-  }
+object EventSuite extends BaseSuite {
+  val tests = this {
+    "Create Next event from a function" - {
+      val value = 2
+      val event = new Bacon.Next[Int](() => value)
+      assert(event.value() == value)
+      assert(event.hasValue())
+      assert(event.isNext())
+    }
 
-  test("Create Next event from a value") {
-    val value = "foo"
-    val event = new Bacon.Next(value)
-    event.value() shouldEqual value
-    event.hasValue() shouldBe true
-    event.isNext() shouldBe true
-  }
+    "Create Next event from a value" - {
+      val value = "foo"
+      val event = new Bacon.Next(value)
+      assert(event.value() == value)
+      assert(event.hasValue())
+      assert(event.isNext())
+    }
 
-  test("Create Initial event") {
-    val value = false
-    val event = new Bacon.Initial(value)
-    event.value() shouldEqual value
-    event.hasValue() shouldBe true
-    event.isInitial() shouldBe true
-  }
+    "Create Initial event" - {
+      val value = false
+      val event = new Bacon.Initial(value)
+      assert(event.value() == value)
+      assert(event.hasValue())
+      assert(event.isInitial())
+    }
 
-  test("Create End event") {
-    val event = new Bacon.End
-    event.hasValue() shouldBe false
-    event.isEnd() shouldBe true
-  }
+    "Create End event" - {
+      val event = new Bacon.End
+      assert(!event.hasValue())
+      assert(event.isEnd())
+    }
 
-  test("Create Error event") {
-    val error = "Something went wrong!"
-    val event = new Bacon.Error(error)
-    event.error shouldEqual error
-    event.hasValue() shouldBe false
-    event.isError() shouldBe true
+    "Create Error event" - {
+      val error = "Something went wrong!"
+      val event = new Bacon.Error(error)
+      assert(event.error == error)
+      assert(!event.hasValue())
+      assert(event.isError())
+    }
   }
 }
