@@ -14,7 +14,7 @@ scalacOptions := Seq(
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-  "com.lihaoyi" %%% "utest" % "0.4.8" % "test"
+  "com.lihaoyi" %%% "utest" % "0.5.3" % "test"
 )
 
 jsDependencies ++= Seq(

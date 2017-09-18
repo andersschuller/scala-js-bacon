@@ -1,5 +1,4 @@
 import utest._
-import utest.framework.{ Result, Tree }
 
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future, Promise }
@@ -9,8 +8,6 @@ abstract class BaseSuite extends TestSuite {
   import BaseSuite._
 
   implicit def executionContext: ExecutionContext = ExecutionContext.Implicits.global
-
-  override def format(results: Tree[Result]): Option[String] = None
 
   def assertAll(assertions: Future[Unit]*): Future[Unit] = {
     Future.sequence(assertions).map(_ => ())
